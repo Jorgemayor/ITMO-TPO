@@ -1,21 +1,40 @@
 package comp.task1;
 
 public class Cos {
+
     public static double calc(double x) {
-        double y = x*Math.PI/180;
+        return calc(x, true);
+    }
 
-        int n = 10;
-        int i, j, fac;
-        double cosine = 0;
-
-        // cos x = 1 – (x2)/2! + (x4)/4! – (x6)/6! + ... = Sum ((-1)n * x(2n)/(2n)!) for n = 0 to n = infinity
-        for(i=0; i<=n; i++){
-            fac = 1;
-            for(j=2; j<=2*i; j++){
-                fac *= j;
-            }
-            cosine += Math.pow(-1.0,i) * Math.pow(y,2*i) / fac;
+    static double factorial(int n) {
+        double fact = 1;
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
         }
-        return cosine;
+        return fact;
+    }
+
+    public static double calc(double x, boolean rad) {
+
+        if (!rad) x = x*Math.PI/180;
+
+        // Convert angle x to be between -2π and 2π
+        x = x % (2 * Math.PI);
+
+        double cosX = 1;
+        int sign = -1;
+        int power = 2;
+        int fact = 2;
+
+        int iter = 100;
+
+        for (int i = 0; i < iter; i++) {
+            cosX += sign * Math.pow(x, power) / factorial(fact);
+            sign *= -1;
+            power += 2;
+            fact += 2;
+        }
+
+        return cosX;
     }
 }

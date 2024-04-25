@@ -16,16 +16,16 @@ public class CosTest {
     @ValueSource(doubles = {-2 * Math.PI, -Math.PI, -0.5 * Math.PI, 0, 0.5 * Math.PI, Math.PI, 1.5 * Math.PI, 2 * Math.PI})
     void checkPiDots(double param) {
         assertAll(
-                () -> assertEquals(Math.sin(param), Cos.calc(param), 0.0001)
+                () -> assertEquals(Math.cos(param), Cos.calc(param), 0.0001)
         );
     }
 
     @ParameterizedTest(name = "cos({0}) = {1}")
-    @DisplayName("Check between dots [-1; +1]")
-    @CsvFileSource(resources = "/resources/values.csv", numLinesToSkip = 1, delimiter = ';')
-    void checkBetweenDotsMinusPiAndPi(double x, double y) {
+    @DisplayName("Check dots degrees")
+    @CsvFileSource(resources = "/values.csv", numLinesToSkip = 1, delimiter = ';')
+    void checkDotsDegrees(double x, double y) {
         assertAll(
-                () -> assertEquals(y, Cos.calc(x), 0.0001)
+                () -> assertEquals(y, Cos.calc(x,false), 0.0001)
         );
     }
 }
