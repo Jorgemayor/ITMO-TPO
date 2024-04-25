@@ -91,6 +91,13 @@ public class SplayTree {
         return node;
     }
 
+    public static Node insert(Node root, int[] keys) {
+        for(int key : keys) {
+            root = insert(root, key);
+        }
+        return root;
+    }
+
     private static void setKeys(Node node) {
         if (node != null) {
             setKeys(node.left);
@@ -99,11 +106,18 @@ public class SplayTree {
         }
     }
 
-    public static void printKeys(Node node) {
+    public static String getTree(Node node) {
         Node.keys = new ArrayList<>();
+        StringBuilder tree = new StringBuilder();
         setKeys(node);
         for (int key : Node.keys) {
-            System.out.println(key);
+            tree.append(key).append("\n");
         }
+        return tree.toString();
+    }
+
+    public static String getTree(Node node, int[] keys) {
+        Node root = insert(null, keys);
+        return getTree(root);
     }
 }
