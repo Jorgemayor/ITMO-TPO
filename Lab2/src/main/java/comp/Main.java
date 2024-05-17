@@ -30,5 +30,10 @@ public class Main {
         System.out.println("\nTask:");
         Task task = new Task();
         System.out.println(task.calc(-1, 0.001));
+
+        System.out.println("\nWriter");
+        CsvWriter writer = new CsvWriter("src/main/resources/results.csv");
+        for(double d=-15; d<=15; d+=0.1)
+            writer.write(d, task.calc(d, 0.001));
     }
 }
