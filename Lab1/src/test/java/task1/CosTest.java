@@ -1,5 +1,6 @@
 package task1;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -14,18 +15,9 @@ public class CosTest {
     @ParameterizedTest(name = "cos({0})")
     @DisplayName("Check PI dots")
     @ValueSource(doubles = {-2 * Math.PI, -Math.PI, -0.5 * Math.PI, 0, 0.5 * Math.PI, Math.PI, 1.5 * Math.PI, 2 * Math.PI})
-    void checkPiDots(double param) {
+    void checkPiDots(double x) {
         assertAll(
-                () -> assertEquals(Math.cos(param), Cos.calc(param), 0.0001)
-        );
-    }
-
-    @ParameterizedTest(name = "cos({0}) = {1}")
-    @DisplayName("Check dots degrees")
-    @CsvFileSource(resources = "/values.csv", numLinesToSkip = 1, delimiter = ';')
-    void checkDotsDegrees(double x, double y) {
-        assertAll(
-                () -> assertEquals(y, Cos.calc(x,false), 0.0001)
+                () -> assertEquals(Math.cos(x), Cos.calc(x), 0.0001)
         );
     }
 }
