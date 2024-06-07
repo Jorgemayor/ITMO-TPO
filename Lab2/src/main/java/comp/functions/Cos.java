@@ -1,5 +1,9 @@
 package comp.functions;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 public class Cos {
 
     private final Sin sin;
@@ -12,24 +16,44 @@ public class Cos {
         this.sin = new Sin();
     }
 
-    public double calc(double x, double eps) {
-        double x_init = x;
-        x %= Math.PI * 2;
-        if (Double.isInfinite(x) || Double.isNaN(x)) {
-            throw new IllegalArgumentException("Argument must be a number");
+    public BigDecimal calc(BigDecimal x, double eps) {
+        MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
+
+        BigDecimal TWO_PI = new BigDecimal(Math.PI * 2, mc);
+        BigDecimal PI = new BigDecimal(Math.PI, mc);
+        BigDecimal HALF_PI = PI.divide(BigDecimal.valueOf(2), mc);
+
+        x = x.remainder(TWO_PI, mc);
+
+        if (x.compareTo(PI.negate()) < 0) {
+            while (x.compareTo(PI.negate()) < 0) {
+                x = x.add(TWO_PI, mc);
+            }
         }
-        if (x < -Math.PI) {
-            while (x < -Math.PI) x += 2 * Math.PI;
+
+        if (x.compareTo(PI) > 0) {
+            while (x.compareTo(PI) > 0) {
+                x = x.subtract(TWO_PI, mc);
+            }
         }
-        if (x > Math.PI) {
-            while (x > Math.PI) x -= 2 * Math.PI;
+
+        BigDecimal sinVal = sin.calc(x, eps);
+        if (sinVal == null) {
+            return null;
         }
-        double result;
-        if (x > Math.PI / 2 || x < -Math.PI / 2) {
-            result = -1 * Math.sqrt(1 - sin.calc(x_init, eps) * sin.calc(x_init, eps));
-        } else result = Math.sqrt(1 - sin.calc(x_init, eps) * sin.calc(x_init, eps));
-        if (Math.abs(result) > 1) return Double.NaN;
-        if (Math.abs(result) <= eps) return 0;
+
+        BigDecimal sinSquared = sinVal.multiply(sinVal, mc);
+        BigDecimal result;
+
+        if (x.compareTo(HALF_PI) > 0 || x.compareTo(HALF_PI.negate()) < 0) {
+            result = BigDecimal.ONE.subtract(sinSquared, mc).sqrt(mc).negate();
+        } else {
+            result = BigDecimal.ONE.subtract(sinSquared, mc).sqrt(mc);
+        }
+
+        if (result.abs(mc).compareTo(BigDecimal.ONE) > 0) return null; // Return null for out of range
+        if (result.abs(mc).compareTo(new BigDecimal(eps)) <= 0) return BigDecimal.ZERO;
+
         return result;
     }
 }

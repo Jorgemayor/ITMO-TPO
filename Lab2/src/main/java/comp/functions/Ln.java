@@ -1,26 +1,36 @@
 package comp.functions;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 public class Ln {
-    public double calc(double x, double eps) {
-        if (Double.isNaN(x) || x < (double) 0) {
-            return Double.NaN;
-        } else if (x == Double.POSITIVE_INFINITY) {
-            return Double.POSITIVE_INFINITY;
-        } else if (x == 0.0) {
-            return Double.NEGATIVE_INFINITY;
+    public BigDecimal calc(BigDecimal x, double eps) {
+        MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
+
+        if (x == null || x.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Argument must be a positive number");
         }
 
-        double constant = ((x - 1) * (x - 1)) / ((x + 1) * (x + 1));
+        BigDecimal ONE = BigDecimal.ONE;
+        BigDecimal TWO = new BigDecimal(2);
+        BigDecimal constant = x.subtract(ONE).multiply(x.subtract(ONE), mc)
+                .divide(x.add(ONE).multiply(x.add(ONE), mc), mc);
 
-        double sum = 0;
-        double currentValue = (x - 1) / (x + 1);
+        BigDecimal sum = BigDecimal.ZERO;
+        BigDecimal currentValue = x.subtract(ONE).divide(x.add(ONE), mc);
         int step = 1;
-        while (Math.abs(currentValue) > eps / 2) {
-            sum += currentValue;
-            currentValue = (2 * step - 1) * currentValue * constant / (2 * step + 1);
+
+        BigDecimal epsilon = new BigDecimal(eps / 2, mc);
+
+        while (currentValue.abs(mc).compareTo(epsilon) > 0) {
+            sum = sum.add(currentValue, mc);
+            currentValue = currentValue.multiply(constant, mc)
+                    .multiply(new BigDecimal(2 * step - 1), mc)
+                    .divide(new BigDecimal(2 * step + 1), mc);
             step++;
         }
-        sum *= 2;
+        sum = sum.multiply(TWO, mc);
         return sum;
     }
 }

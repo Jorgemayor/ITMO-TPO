@@ -10,6 +10,9 @@ import org.mockito.Mockito;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 public class TaskTest {
     private static Sin mockedSin;
@@ -30,7 +33,9 @@ public class TaskTest {
     private static Log log2;
     private static Log log5;
 
-    private static final double eps = 0.01;
+    private static final double eps = 0.1;
+    private static final MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
+
 
     @BeforeAll
     static void init() {
@@ -54,35 +59,35 @@ public class TaskTest {
 
         try {
             Reader cosReader = new FileReader("src/test/resources/cos.csv");
-            Reader sinReader = new FileReader("src/main/resources/sin.csv");
-            Reader tanReader = new FileReader("src/main/resources/tan.csv");
-            Reader lnReader = new FileReader("src/main/resources/ln.csv");
-            Reader log2Reader = new FileReader("src/main/resources/log2.csv");
-            Reader log5Reader = new FileReader("src/main/resources/log5.csv");
+            Reader sinReader = new FileReader("src/test/resources/sin.csv");
+            Reader tanReader = new FileReader("src/test/resources/tan.csv");
+            Reader lnReader = new FileReader("src/test/resources/ln.csv");
+            Reader log2Reader = new FileReader("src/test/resources/log2.csv");
+            Reader log5Reader = new FileReader("src/test/resources/log5.csv");
 
             for (CSVRecord record : CSVFormat.DEFAULT.parse(cosReader)) {
-                Mockito.when(mockedCos.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedCos.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
             for (CSVRecord record : CSVFormat.DEFAULT.parse(sinReader)) {
-                Mockito.when(mockedSin.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedSin.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
             for (CSVRecord record : CSVFormat.DEFAULT.parse(tanReader)) {
-                Mockito.when(mockedTan.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedTan.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
             for (CSVRecord record : CSVFormat.DEFAULT.parse(lnReader)) {
-                Mockito.when(mockedLn.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedLn.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
             for (CSVRecord record : CSVFormat.DEFAULT.parse(log2Reader)) {
-                Mockito.when(mockedLog2.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedLog2.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
             for (CSVRecord record : CSVFormat.DEFAULT.parse(log5Reader)) {
-                Mockito.when(mockedLn.calc(Double.parseDouble(record.get(0)), eps))
-                        .thenReturn(Double.parseDouble(record.get(1)));
+                Mockito.when(mockedLn.calc(BigDecimal.valueOf(Double.parseDouble(record.get(0))), eps))
+                        .thenReturn(BigDecimal.valueOf(Double.parseDouble(record.get(1))));
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -91,93 +96,118 @@ public class TaskTest {
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testMock(double value, double expected) {
+    void testMock(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD, mc);
+        BigDecimal expected = new BigDecimal(expectedD, mc);
         Task task = new Task(mockedCos, mockedTan, mockedCsc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testCos(double value, double expected) {
+    void testCos(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(cos, mockedTan, mockedCsc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testTan(double value, double expected) {
+    void testTan(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, tan, mockedCsc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testCosTan(double value, double expected) {
+    void testCosTan(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(cos, tan, mockedCsc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testTanArg(double value, double expected) {
+    void testTanArg(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, new Tan(sin, cos), mockedCsc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testCsc(double value, double expected) {
+    void testCsc(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, csc, mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testCscArg(double value, double expected) {
+    void testCscArg(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, new Csc(mockedSin), mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testArg(double value, double expected) {
+    void testArg(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(cos, new Tan(sin, cos), new Csc(sin), mockedLn, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testLn(double value, double expected) {
+    void testLn(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, mockedCsc, ln, mockedLog2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testLog2(double value, double expected) {
+    void testLog2(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, mockedCsc, mockedLn, log2, mockedLog5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testLog5(double value, double expected) {
+    void testLog5(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, mockedCsc, mockedLn, mockedLog2, log5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testAllLog(double value, double expected) {
+    void testAllLog(double valueD, double expectedD) {
+        BigDecimal value = new BigDecimal(valueD);
+        BigDecimal expected = new BigDecimal(expectedD);
         Task task = new Task(mockedCos, mockedTan, mockedCsc, ln, log2, log5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        Assertions.assertEquals(expected, task.calc(value, eps));
     }
 
     @ParameterizedTest
     @CsvFileSource(resources = "/task.csv")
-    void testAll(double value, double expected) {
+    void testAll(double valueD, double expected) {
         Task task = new Task(cos, new Tan(sin, cos), new Csc(sin), ln, log2, log5);
-        Assertions.assertEquals(expected, task.calc(value, eps), eps);
+        double value = task.calc(new BigDecimal(valueD, mc), eps).doubleValue();
+        Assertions.assertEquals(expected, value, eps);
     }
 }

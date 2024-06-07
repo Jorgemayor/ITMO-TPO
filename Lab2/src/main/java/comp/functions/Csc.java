@@ -1,5 +1,9 @@
 package comp.functions;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 public class Csc {
     private final Sin sin;
 
@@ -11,11 +15,13 @@ public class Csc {
         this.sin = new Sin();
     }
 
-    public double calc(double x, double eps) {
-        double sinVal = sin.calc(x, eps);
-        if (Double.isNaN(sinVal) || sinVal == 0) {
-            return Double.NaN;
+    public BigDecimal calc(BigDecimal x, double eps) {
+        MathContext mc = new MathContext(10, RoundingMode.HALF_UP);
+
+        BigDecimal sinVal = sin.calc(x, eps);
+        if (sinVal == null || sinVal.compareTo(BigDecimal.ZERO) == 0) {
+            return null; // Return null if sinVal is NaN or zero
         }
-        return 1 / sinVal;
+        return BigDecimal.ONE.divide(sinVal, mc);
     }
 }

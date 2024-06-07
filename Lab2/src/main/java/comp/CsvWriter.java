@@ -9,7 +9,7 @@ import java.io.Writer;
 
 public class CsvWriter {
 
-    private static final CSVFormat FORMAT = CSVFormat.DEFAULT.builder().setDelimiter(';').build();
+    private static final CSVFormat FORMAT = CSVFormat.DEFAULT.builder().setDelimiter(',').build();
     private CSVPrinter csvPrinter;
 
     public CsvWriter(String path) {
