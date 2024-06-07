@@ -26,10 +26,10 @@ public class ImageTest {
   }
 
   @Test
-  public void voiceSpeed() {
+  public void image() {
     for (WebDriver driver : drivers) {
       System.out.println(driver.getTitle());
-      driver.get("https://translate.google.ru/?sl=en&tl=es&op=translate");
+      driver.get(CustomDriver.getSiteUrl());
       driver.manage().window().setSize(new Dimension(1050, 748));
       driver.findElement(By.xpath("//body[@id=\'yDmH0d\']/c-wiz/div/div[2]/c-wiz/div/nav/div[2]/div/button/span")).click();
       driver.findElement(By.xpath("//body[@id=\'yDmH0d\']/c-wiz/div/div[2]/c-wiz/div[5]/c-wiz/div[2]/c-wiz/div/div/div/div/div[2]/div[2]/div/label")).click();
