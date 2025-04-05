@@ -18,6 +18,7 @@ public class VoiceSpeedTest {
   public void setUp() {
     drivers = CustomDriver.newDrivers();
   }
+
   @AfterEach
   public void tearDown() {
     for (WebDriver driver : drivers) {
